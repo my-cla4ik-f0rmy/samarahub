@@ -3,8 +3,6 @@
     <route>
         <KR_ID>1</KR_ID>
         <number>1</number>
-        <firstStopRU></firstStopRU>
-        <lastStopRU></lastStopRU>
         <direction>Железнодорожный вокзал</direction>
         <directionEn>Zheleznodorozhnyi Vokzal</directionEn>
         <directionEs>Zheleznodorozhny vokzal</directionEs>

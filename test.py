@@ -1,67 +1,76 @@
+import requests
+import xml.etree.ElementTree as ET
+import json
+from transliterate import translit
+
+# URL OpenStreetMap API
+import requests
 import xml.etree.ElementTree as ET
 
-def convert_routes_to_xml(routes):
-    buses_municipal = ET.Element("busesMunicipal")
-    for route in routes:
-        route_element = ET.SubElement(buses_municipal, "route")
-        number_element = ET.SubElement(route_element, "number")
-        number_element.text = route.strip()  # Удаляем лишние пробелы и добавляем номер маршрута
-    return buses_municipal
+def get_route_data(relation_id):
+    url = f"https://www.openstreetmap.org/api/0.6/relation/{relation_id}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        root = ET.fromstring(response.text)
+        route_data = {}
+        route_data['id'] = relation_id
+        for tag in root.findall('.//tag'):
+            if tag.attrib['k'] == 'ref':
+                route_data['routeNumber'] = int(tag.attrib['v'])
+            elif tag.attrib['k'] == 'name':
+                route_data['routeName'] = tag.attrib['v']
+        directions = []
+        for member in root.findall('.//member'):
+            direction_id = member.attrib['ref']
+            directions.append(direction_id)
+        route_data['directions'] = directions
+        return route_data
+    else:
+        return None
 
-def process_xml_file(input_file, output_file):
-    tree = ET.parse(input_file)
-    root = tree.getroot()
+print(get_route_data(1663677))
 
-    for buses_municipal in root.iter('busesMunicipal'):
-        if buses_municipal.text:
-            routes = buses_municipal.text.split(',')
-            buses_municipal.clear()
-            buses_municipal.extend(convert_routes_to_xml(routes).findall('route'))
+data = get_route_data(1663677)
 
-    tree.write(output_file, encoding='utf-8', xml_declaration=True)
+for i in data['directions']:
+    print(get_route_data(i))
 
-def convert_routes_to_xml(routes):
-    buses_municipal = ET.Element("busesSeason")
-    for route in routes:
-        route_element = ET.SubElement(buses_municipal, "route")
-        number_element = ET.SubElement(route_element, "number")
-        number_element.text = route.strip()  # Удаляем лишние пробелы и добавляем номер маршрута
-    return buses_municipal
 
-def process_xml_file(input_file, output_file):
-    tree = ET.parse(input_file)
-    root = tree.getroot()
+url = "https://www.openstreetmap.org/api/0.6/relation/1663633"
+base_url = "https://www.openstreetmap.org/api/0.6/way/{}"
 
-    for buses_municipal in root.iter('busesSeason'):
-        if buses_municipal.text:
-            routes = buses_municipal.text.split(',')
-            buses_municipal.clear()
-            buses_municipal.extend(convert_routes_to_xml(routes).findall('route'))
+# Список для хранения информации остановок
+stops = []
 
-    tree.write(output_file, encoding='utf-8', xml_declaration=True)
 
-def remove_spanish_titles(input_file, output_file):
-    tree = ET.parse(input_file)
-    root = tree.getroot()
+# Проверка статуса запроса
+    # Парсинг XML-ответа
+for i in data['directions']:
+    print(i)
+    a = get_route_data(i)
+    for j in a['directions']:
+        print(j)
+        root = j
+        platform_url = base_url.format(root)
+        platform_response = requests.get(platform_url)
+        if platform_response.status_code == 200:
+            platform_root = ET.fromstring(platform_response.content)
+            name_tag = platform_root.find('.//tag[@k="name"]')
+            if name_tag is not None:
+                platform_name_ru = name_tag.attrib['v']
+                platform_name_en = translit(platform_name_ru, 'ru', reversed=True)  # Транслитерация на английский
+                stop_info = {
+                    "id": platform_id,
+                    "ru": platform_name_ru,
+                    "en": platform_name_en
+                }
+                stops.append(stop_info)
+            else:
+                print("Для остановки ID:", platform_id, "нет информации о названии")
+        else:
+            print("Ошибка при получении информации об остановке ID:", platform_id, "- статус код:", platform_response.status_code)
+else:
+    print("Ошибка при выполнении запроса:", response.status_code)
 
-    for stop in root.iter('stop'):
-        title_es = stop.find('titleEs')
-        if title_es is not None:
-            stop.remove(title_es)
-        
-        adjacent_street_es = stop.find('adjacentStreetEs')
-        if adjacent_street_es is not None:
-            stop.remove(adjacent_street_es)
-        
-        direction_es = stop.find('directionEs')
-        if direction_es is not None:
-            stop.remove(direction_es)
-
-    tree.write(output_file, encoding='utf-8', xml_declaration=True)
-
-# Используйте путь к вашему XML файлу
-input_file = 'stopsFullDB.xml'
-output_file = 'modified_xml_file.xml'
-
-process_xml_file('modified_xml_file.xml', output_file)
-""" remove_spanish_titles('modified_xml_file.xml', output_file) """
+# Вывод списка остановок в формате JSON
+print(json.dumps({"stops": stops}, ensure_ascii=False, indent=4))

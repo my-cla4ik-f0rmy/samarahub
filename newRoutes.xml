@@ -1,0 +1,33 @@
+<routes>
+    <route>
+        <ID>00001</ID>
+        <firstStopRU>Железнодорожный вокзал</firstStopRU> <!-- Начальная остановка РУ -->
+        <lastStopRU>Батайская улица</lastStopRU> <!-- Конечная остановка РУ -->
+        <firstStopEN>Zheleznodorozhny vokzal</firstStopEN> <!-- Начальная остановку EN -->
+        <lastStopEN>Bataiskaia Ulitsa</lastStopEN> <!-- Конечная остановка EN -->
+        <transportType>01</transportType> <!-- Тип транспорта -->
+        <routeNumber>1</routeNumber> <!-- Номер маршрута -->
+        <subway></subway> <!-- Проезжает ли метро -->
+        <routeFirst> <!-- Маршрут в одном направлении -->
+            <stops> <!--  -->
+                <stop>Железнодорожный вокзал</stop> <!--  -->
+                ...
+                <stop>Батайская улица</stop>
+            </stops>
+        </routeFirst>
+        <routeSecond> <!-- Маршрут в обратном направлении -->
+            <stops> <!--  -->
+                <stop>Батайская улица</stop> <!--  -->
+                ...
+                <stop>Железнодорожный вокзал</stop>
+            </stops>
+        </routeSecond>
+    </route>
+    
+</routes>
+
+<!-- 01 - City Bus -->
+<!-- 02 - Trolleybus -->
+<!-- 03 - Tramway -->
+<!-- 14 - City Route Taxi -->
+<!-- 15 - Suburban Route Taxi -->
