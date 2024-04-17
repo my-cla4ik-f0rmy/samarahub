@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 
 # URL страницы с таблицей
-url = "http://www.samaratrans.info/wiki/index.php?title=Самара_трамвай_маршруты"
+url = "http://www.samaratrans.info/wiki/index.php?title=Самара_автобус_маршруты"
 
 # Получаем HTML-код страницы
 response = requests.get(url)
@@ -27,15 +27,15 @@ for row in table.find_all("tr")[1:]:  # пропускаем первую стр
         depot = columns[2].text.strip()
         schedule = columns[3].text.strip()
         route_info = {
-            "№": route_number,
-            "Наименование маршрута": route_name,
-            "Депо": depot,
-            "Режим работы": schedule
+            "number": route_number,
+            "name": route_name,
+            "depo": depot,
+            "operation": schedule
         }
         routes_data.append(route_info)
 
 # Сохраняем данные в файл JSON
-with open("routes.json", "w", encoding="utf-8") as json_file:
+with open("routesbus.json", "w", encoding="utf-8") as json_file:
     json.dump(routes_data, json_file, ensure_ascii=False, indent=4)
 
 print("Данные сохранены в файл routes.json")
