@@ -29,8 +29,7 @@ for stop in root.findall('stop'):
     stop_data = {}
     for elem in stop:
         if elem.tag in tags_to_include:
-            if elem.tag.startswith("buses"):
-                # Разделение строковых значений на списки целых чисел
+            if elem.tag.startswith("buses") or elem.tag.startswith("trams") or elem.tag.startswith("metros") or elem.tag.startswith("electricTrains") or elem.tag.startswith("riverTransports") or elem.tag.startswith("trolleybuses"):
                 stop_data[elem.tag] = [bus.strip() for bus in elem.text.split(",")] if elem.text else []
             else:
                 stop_data[elem.tag] = elem.text
